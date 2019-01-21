@@ -1,0 +1,86 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
+    xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:utilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    xmlns:local="clr-namespace:vssdk_settings"
+    x:Class="vssdk_settings.SettingsControl"
+    mc:Ignorable="d"
+    d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <utilities:BrushToColorConverter x:Key="BrushToColorConverter"/>
+
+        <CollectionViewSource x:Key="allSettings" Source="{Binding SettingsGroup.Settings}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveSortingProperties>
+                <System:String>Name</System:String>
+            </CollectionViewSource.LiveSortingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription Direction="Ascending" PropertyName="Name"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="200" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Grid.Column="0">
+            <ToolBar DockPanel.Dock="Top">
+                <Button Command="{Binding AddSettingsCommand}"
+                        theming:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+                    <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Add}" Width="16" Height="16" ToolTip="Add" />
+                </Button>
+                <Button Command="{Binding DeleteSettingsCommand}"
+                        theming:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+                    <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.RemoveCommand}" Width="16" Height="16" ToolTip="Delete" />
+                </Button>
+                <Button Command="{Binding CopySettingsCommand}"
+                        theming:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+                    <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.CopyItem}" Width="16" Height="16" ToolTip="Make a Copy" />
+                </Button>
+            </ToolBar>
+            <ListView ItemsSource="{Binding Source={StaticResource allSettings}}" SelectedItem="{Binding SettingsGroup.CurrentSettings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsSynchronizedWithCurrentItem="False" SelectionMode="Single">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </DockPanel>
+
+        <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" Margin="3 0" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" VerticalAlignment="Stretch" />
+
+        <StackPanel Grid.Row="0" Grid.Column="3" Grid.IsSharedSizeScope="True" Margin="0 0 3 3">
+            <GroupBox Header="Basic Settings">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Content="Settings Name:" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3" Text="{Binding SettingsGroup.CurrentSettings.Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Content="Settings Number:" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="3" Text="{Binding SettingsGroup.CurrentSettings.Number, NotifyOnValidationError=True, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</UserControl>
